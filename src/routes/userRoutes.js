@@ -1,28 +1,9 @@
 import express from "express"
 import { User}  from "../models/user.js"
 import { userCreate, login } from "../controladores/userControler.js"
-import { verifyToken, requireAdmin } from "../services/auth.service.js"
+import { authenticateToken, verifyRol } from "../middleware/auth.js"
 
 export const userRoutes = express.Router()
-
-const authenticateToken = (req,res,next)=>{
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(" ")[1]
-    if(!token){
-        return res.status(401).json({message:'no existe token'})
-    }
-    verifyToken(token)
-    next()
-}
-
-const verifyRol = (req,res,next)=>{
-    const rol = req.user.rol
-    if(!rol){
-        return res.status(401).json({mesagge: `El usuario no tiene asignado un rol`})
-    }
-    requireAdmin(rol)
-    next()
-}
 
 userRoutes.get("/api/users",authenticateToken,verifyRol,async(req,res)=>{
     try {

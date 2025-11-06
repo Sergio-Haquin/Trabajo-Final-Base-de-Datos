@@ -1,28 +1,9 @@
 import express from 'express'
 import { Category } from '../models/categoryModel'
 import { categoryCreate } from '../controllers/categoryController.js'
-import { verifyToken, requireAdmin } from '../services/auth.service.js'
+import { verifyRol, authenticateToken } from '../middleware/auth.js'
 
 export const categoryRoutes = express.Router()
-
-const authenticateToken = (req,res,next)=>{
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(" ")[1]
-    if(!token){
-        return res.status(401).json({message:'no existe token'})
-    }
-    verifyToken(token)
-    next()
-}
-
-const verifyRol = (req,res,next)=>{
-    const rol = req.user.rol
-    if(!rol){
-        return res.status(401).json({mesagge: `El usuario no tiene asignado un rol`})
-    }
-    requireAdmin(rol)
-    next()
-}
 
 categoryRoutes.get("/api/categorias/stats", async(req,res)=>{
     try {
