@@ -17,7 +17,7 @@ userRoutes.get("/api/users",authenticateToken,verifyRol,async(req,res)=>{
     }
 })
 
-userRoutes.get("api/users/:id", async(req,res)=>{
+userRoutes.get("/api/users/:id", async(req,res)=>{
     try {
         const id = req.params
         const user = await User.findById(id)
