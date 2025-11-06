@@ -5,7 +5,7 @@ import { verifyRol, authenticateToken } from '../middleware/auth.js'
 
 export const categoryRoutes = express.Router()
 
-categoryRoutes.get("/api/categorias/stats", async(req,res)=>{
+categoryRoutes.get("/stats", async(req,res)=>{
     try {
         const productForCategory = await Category.aggregate([
             {   
@@ -23,7 +23,7 @@ categoryRoutes.get("/api/categorias/stats", async(req,res)=>{
     }
 })
 
-categoryRoutes.post("/api/categoria",authenticateToken,verifyRol, async(req,res)=>{
+categoryRoutes.post("/",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const {nombre,descripcion} = req.body
         if(!nombre || !descripcion){
@@ -40,7 +40,7 @@ categoryRoutes.post("/api/categoria",authenticateToken,verifyRol, async(req,res)
     }
 })
 
-categoryRoutes.put("/api/categoria/:id",authenticateToken,verifyRol, async(req,res)=>{
+categoryRoutes.put("/:id",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const { id } = req.params;
         const { nombre, descripcion } = req.body;
@@ -57,7 +57,7 @@ categoryRoutes.put("/api/categoria/:id",authenticateToken,verifyRol, async(req,r
     }
 })
 
-categoryRoutes.delete("/api/categoria/:id",authenticateToken,verifyRol, async(req,res)=>{
+categoryRoutes.delete("/:id",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const { id } = req.params;
         const categoryDelete = await Category.findByIdAndDelete(id);

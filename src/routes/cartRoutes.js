@@ -5,7 +5,7 @@ import { authenticateToken } from '../middleware/auth.js'
 
 const cartRoutes = express.Router()
 
-cartRoutes.get("/api/carrito/:userId",authenticateToken, async(req,res)=>{
+cartRoutes.get("/:userId",authenticateToken, async(req,res)=>{
     try {
         const user_id = req.params
         const cart = await Cart.findOne({ user_id: user_id })
@@ -20,7 +20,7 @@ cartRoutes.get("/api/carrito/:userId",authenticateToken, async(req,res)=>{
     }
 })
 
-cartRoutes.get("/api/carrito/:userId/total",authenticateToken, async(req,res)=>{
+cartRoutes.get("/:userId/total",authenticateToken, async(req,res)=>{
     try {
         const {user_id} = req.params
         const cart = await Cart.findOne({user_id: user_id})
@@ -45,7 +45,7 @@ cartRoutes.get("/api/carrito/:userId/total",authenticateToken, async(req,res)=>{
     }
 })
 
-cartRoutes.put("/api/carrito/:userId",authenticateToken, async(req,res)=>{
+cartRoutes.put("/:userId",authenticateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const {items: producto_id, cantidad} = req.body
@@ -71,7 +71,7 @@ cartRoutes.put("/api/carrito/:userId",authenticateToken, async(req,res)=>{
     }
 })
 
-cartRoutes.delete("/api/carrito/:userId/:prductId",authenticateToken, async(req,res)=>{
+cartRoutes.delete("/:userId/:prductId",authenticateToken, async(req,res)=>{
     try {
         const {user_id} = req.params
         const {producto_id} = req.params
@@ -94,7 +94,7 @@ cartRoutes.delete("/api/carrito/:userId/:prductId",authenticateToken, async(req,
     }
 })
 
-cartRoutes.delete("/api/carrito/:userId", authenticateToken, async(req,res)=>{
+cartRoutes.delete("/:userId", authenticateToken, async(req,res)=>{
     try {
         const user_id = req.params
         const cart = await Cart.findOne({ user_id: user_id })

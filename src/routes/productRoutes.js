@@ -6,7 +6,7 @@ import { Category } from '../models/categoryModel.js'
 
 export const productRoutes = express.Router()
 
-productRoutes.get("/api/productos", async(req,res)=>{
+productRoutes.get("/", async(req,res)=>{
     try{
         const products = await Product.find({})
             .populate('categoria_id', 'nombre')
@@ -27,7 +27,7 @@ productRoutes.get("/api/productos", async(req,res)=>{
     }
 })
 
-productRoutes.get("/api/productos/filtro", async(req,res)=>{
+productRoutes.get("/filtro", async(req,res)=>{
     try {
         const { min, max, marca } = req.params
         const filtro ={}
@@ -50,7 +50,7 @@ productRoutes.get("/api/productos/filtro", async(req,res)=>{
     }
 })
 
-productRoutes.get("/api/productos/top", async(req,res)=>{
+productRoutes.get("/top", async(req,res)=>{
     try {
         const productTopResenas = await Product.aggregate([
             {
@@ -86,7 +86,7 @@ productRoutes.get("/api/productos/top", async(req,res)=>{
     }
 })
 
-productRoutes.post("/api/productos",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.post("/",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const {nombre,marca,descripcion,precio,categoria_id,stock} = req.body
         if(!nombre || !marca || !descripcion || !precio || !categoria_id || !stock){
@@ -105,7 +105,7 @@ productRoutes.post("/api/productos",authenticateToken,verifyRol, async(req,res)=
     }
 })
 
-productRoutes.put("/api/productos/:id",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.put("/:id",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const { id } = req.params
         const datos = req.body
@@ -122,7 +122,7 @@ productRoutes.put("/api/productos/:id",authenticateToken,verifyRol, async(req,re
     }
 })
 
-productRoutes.patch("/api/productos/:id/stock",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.patch("/:id/stock",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const { id } = req.params
         const { stock } = req.body
@@ -143,7 +143,7 @@ productRoutes.patch("/api/productos/:id/stock",authenticateToken,verifyRol, asyn
     }
 })
 
-productRoutes.delete("/api/producto/:id",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.delete("/:id",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const {id} = req.params
         const productDelete = await Product.findByIdAndDelete(id)

@@ -5,7 +5,7 @@ import { authenticateToken, verifyRol } from "../middleware/auth.js"
 
 export const userRoutes = express.Router()
 
-userRoutes.get("/api/users",authenticateToken,verifyRol,async(req,res)=>{
+userRoutes.get("/",authenticateToken,verifyRol,async(req,res)=>{
     try {
         const users = await User.find()
         if(users.length === 0){
@@ -17,7 +17,7 @@ userRoutes.get("/api/users",authenticateToken,verifyRol,async(req,res)=>{
     }
 })
 
-userRoutes.get("api/users/:id", async(req,res)=>{
+userRoutes.get("/:id", async(req,res)=>{
     try {
         const id = req.params
         const user = await User.findById(id)
@@ -30,7 +30,7 @@ userRoutes.get("api/users/:id", async(req,res)=>{
     }
 })
 
-userRoutes.post("/api/users", async(req, res)=>{
+userRoutes.post("/", async(req, res)=>{
     try {
         const {nombre,email,direccion,telefono,rol,contraseña} = req.body
         if(!nombre || !email || !direccion || !telefono || !rol || !contraseña){
@@ -47,7 +47,7 @@ userRoutes.post("/api/users", async(req, res)=>{
     }
 })
 
-userRoutes.post("/api/users/login", async(req,res)=>{
+userRoutes.post("/login", async(req,res)=>{
     try{
         const {email,contraseña} = req.body
         if(!email || !contraseña){
@@ -60,7 +60,7 @@ userRoutes.post("/api/users/login", async(req,res)=>{
     }
 })
 
-userRoutes.delete("/api/users/:id", async(req,res)=>{
+userRoutes.delete("/:id", async(req,res)=>{
     try {
         const id = req.params
         const userDelete = await User.findByIdAndDelete(id)

@@ -5,7 +5,7 @@ import { authenticateToken, verifyRol } from '../middleware/auth.js'
 
 const reviewRoutes = express.Router()
 
-reviewRoutes.get("/api/resenas", async(req,res)=>{
+reviewRoutes.get("/", async(req,res)=>{
     try {
         const reviews = await Review.find()
         if(reviews.length === 0){
@@ -17,7 +17,7 @@ reviewRoutes.get("/api/resenas", async(req,res)=>{
     }
 })
 
-reviewRoutes.get("/api/resenas/product/:productId", async(req,res)=>{
+reviewRoutes.get("/product/:productId", async(req,res)=>{
     try {
         const {producto_id} = req.params
         const resenasProduct = await Review.find({producto_id: producto_id})
@@ -32,7 +32,7 @@ reviewRoutes.get("/api/resenas/product/:productId", async(req,res)=>{
     }
 })
 
-reviewRoutes.get("/api/resenas/top", async(req,res)=>{
+reviewRoutes.get("/top", async(req,res)=>{
     try {
         const promCal = Review.aggregate([
             {
@@ -67,7 +67,7 @@ reviewRoutes.get("/api/resenas/top", async(req,res)=>{
     }
 })
 
-reviewRoutes.post("/api/resenaas",authenticateToken, async(req,res)=>{
+reviewRoutes.post("/",authenticateToken, async(req,res)=>{
     try {
         const {user_id,producto_id,calificacion,comentario} = req.body
         if(!user_id || !producto_id || !calificacion || !comentario){
@@ -89,7 +89,7 @@ reviewRoutes.post("/api/resenaas",authenticateToken, async(req,res)=>{
     }
 })
 
-reviewRoutes.put("api/resenas/:id",authenticateToken, async(req,res)=>{
+reviewRoutes.put("/:id",authenticateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const datos = req.body
@@ -106,7 +106,7 @@ reviewRoutes.put("api/resenas/:id",authenticateToken, async(req,res)=>{
     }
 })
 
-reviewRoutes.delete("/api/resenas/:id",authenticateToken, async(req,res)=>{
+reviewRoutes.delete("/:id",authenticateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const reviewDelete = await Review.findByIdAndDelete(id)
