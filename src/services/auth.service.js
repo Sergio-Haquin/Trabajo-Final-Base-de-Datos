@@ -19,3 +19,5 @@ export const requireAdmin = (rol)=>{
         throw new Error("Se requiere rol de administrador")
     }
 }
+
+//hola
