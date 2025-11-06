@@ -20,4 +20,4 @@ export const requireAdmin = (rol)=>{
     }
 }
 
-//hola
+//ho
