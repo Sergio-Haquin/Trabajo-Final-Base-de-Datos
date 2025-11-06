@@ -1,6 +1,6 @@
 import { Review } from '../models/reviewModel.js'
 
-export const reviewCreate = async(user_id,product_id,calificacion,comentario,fecha) => {
+export const reviewCreate = async(user_id,product_id,calificacion,comentario) => {
     const review = new Review(
         {
             user_id,

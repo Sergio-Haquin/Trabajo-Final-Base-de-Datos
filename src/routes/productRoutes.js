@@ -111,7 +111,7 @@ productRoutes.put("/api/productos/:id",authenticateToken,verifyRol, async(req,re
         const datos = req.body
         const productUpdate = await Product.findByIdAndUpdate(id, datos, {
             new: true,
-            runValidators: true,
+            runValidators: true
         })
         if (!productUpdate){
             res.status(400).json({ error: "Producto no encontrado" })
