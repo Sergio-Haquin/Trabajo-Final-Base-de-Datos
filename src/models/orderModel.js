@@ -9,7 +9,7 @@ const orderModel = mongoose.Schema(
             ref: 'User',
             required: true
         },
-        fecha: { type: Date, required: true },
+        fecha: { type: Date, default: Date.now },
         estado: { type: String, enum: Estado, required: true },
         productos: [
             {
