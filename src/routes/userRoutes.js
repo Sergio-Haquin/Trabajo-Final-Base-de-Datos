@@ -49,11 +49,11 @@ userRoutes.post("/", async(req, res)=>{
 
 userRoutes.post("/login", async(req,res)=>{
     try{
-        const {email,contraseña} = req.body
-        if(!email || !contraseña){
+        const {email,contrasena} = req.body
+        if(!email || !contrasena){
             res.status(400).json({mesagge:`Algunos de los parametros esta vacio`})
         }
-        const newUser = await login(email,contraseña)
+        const newUser = await login(email,contrasena)
         res.status(201).json(newUser)
     } catch (error) {
         res.status(500).json({mesagge:`Error en el login: ${error}`})
