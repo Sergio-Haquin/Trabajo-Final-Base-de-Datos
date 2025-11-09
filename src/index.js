@@ -10,11 +10,12 @@ import { orderRoutes } from './routes/orderRoutes.js'
 const app = express()
 app.use(express.json())
 
-mongoose.connect(precess.env.MONGO_URL,{dbName:process.env.DB_NAME}).then(()=>
+mongoose.connect(process.env.MONGO_URL,{dbName:process.env.DB_NAME}).then(()=>
     console.log("Conexion Correcta")
 ).catch((e)=>{
     console.error("Error al conectarse con mongo", e)
 })
+
 
 app.use("/api/users",userRoutes)
 app.use("/api/categorias",categoryRoutes)

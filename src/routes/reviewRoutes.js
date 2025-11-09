@@ -1,9 +1,9 @@
 import express from 'express'
-import { Review } from '../models/reviewModel'
+import { Review } from '../models/reviewModel.js'
 import { reviewCreate } from '../controllers/reviewController.js'
 import { authenticateToken, verifyRol } from '../middleware/auth.js'
 
-const reviewRoutes = express.Router()
+export const reviewRoutes = express.Router()
 
 reviewRoutes.get("/", async(req,res)=>{
     try {

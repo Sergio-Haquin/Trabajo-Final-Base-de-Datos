@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import Estado from '../enums/estado.js'
-import MetodoPago from '../enums/metodoPago.js'
+import { Estado } from '../enums/estado.js'
+import { MetodoPago } from '../enums/metodoPago.js'
 
 const orderModel = mongoose.Schema(
     {

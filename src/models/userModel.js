@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import Rol from '../enums/rol.js'
+import { Rol } from '../enums/rol.js'
 
 const userModel = mongoose.Schema(
     {
@@ -17,7 +17,7 @@ const userModel = mongoose.Schema(
             enum: Rol, 
             default: 'cliente' 
         },
-        contraseña: { type: String, required: true }
+        contrasena: { type: String, required: true }
     }
 )
 

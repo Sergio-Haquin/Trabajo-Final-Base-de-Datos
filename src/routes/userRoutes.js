@@ -1,6 +1,6 @@
 import express from "express"
-import { User}  from "../models/user.js"
-import { userCreate, login } from "../controladores/userControler.js"
+import { User}  from "../models/userModel.js"
+import { userCreate, login } from "../controllers/userController.js"
 import { authenticateToken, verifyRol } from "../middleware/auth.js"
 
 export const userRoutes = express.Router()
@@ -32,15 +32,15 @@ userRoutes.get("/:id", async(req,res)=>{
 
 userRoutes.post("/", async(req, res)=>{
     try {
-        const {nombre,email,direccion,telefono,rol,contraseña} = req.body
-        if(!nombre || !email || !direccion || !telefono || !rol || !contraseña){
+        const {nombre,email,direccion,telefono,rol,contrasena} = req.body
+        if(!nombre || !email || !direccion || !telefono || !rol || !contrasena){
             res.status(400).json({mesagge:`Alguno de los parametros esta vacio`})
         }
         const userExist = await User.findOne({email})
         if(userExist){
             res.status(400).json({mesagge:`El email ya esta registrado`})
         }
-        const newUser = await userCreate(nombre,email,direccion,telefono,rol,contraseña)
+        const newUser = await userCreate(nombre,email,direccion,telefono,rol,contrasena)
         res.status(201).json(newUser)
     } catch (error) {
         res.status(500).json({mesagge:`Error en el post de users: ${error}`})

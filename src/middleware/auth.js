@@ -1,4 +1,4 @@
-import { verifyToken, requireAdmin } from "../services/auth.service"
+import { verifyToken, requireAdmin } from "../services/auth.service.js"
 
 export const authenticateToken = (req,res,next)=>{
     const authHeader = req.headers['authorization']

@@ -21,7 +21,7 @@ orderRoutes.get("/", async(req,res)=>{
     }
 })
 
-orederRoutes.get("/stats",authenticateToken,verifyRol, async(req,res)=>{
+orderRoutes.get("/stats",authenticateToken,verifyRol, async(req,res)=>{
     try {
         const stats = await Order.aggregate([
             {

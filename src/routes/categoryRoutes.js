@@ -1,5 +1,5 @@
 import express from 'express'
-import { Category } from '../models/categoryModel'
+import { Category } from '../models/categoryModel.js'
 import { categoryCreate } from '../controllers/categoryController.js'
 import { verifyRol, authenticateToken } from '../middleware/auth.js'
 

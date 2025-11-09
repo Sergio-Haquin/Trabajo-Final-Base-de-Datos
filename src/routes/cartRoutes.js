@@ -3,7 +3,7 @@ import { Cart } from '../models/cartModel.js'
 import { cartCreate } from '../controllers/cartController.js'
 import { authenticateToken } from '../middleware/auth.js'
 
-const cartRoutes = express.Router()
+export const cartRoutes = express.Router()
 
 cartRoutes.get("/:userId",authenticateToken, async(req,res)=>{
     try {

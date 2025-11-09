@@ -3,7 +3,7 @@ import { hashPassword, validatePass } from '../services/password.service.js'
 import { generateToken } from '../services/auth.service.js'
 
 export const userCreate = async(nombre,email,direccion,telefono,rol,contrasena) => {
-    const pass = hashPassword(contrasena)
+    const pass = await hashPassword(contrasena)
     const user = new User(
         {
             nombre,
