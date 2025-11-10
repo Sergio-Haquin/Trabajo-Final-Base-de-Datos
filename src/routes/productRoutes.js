@@ -1,8 +1,8 @@
 import express from 'express'
 import { Product } from '../models/productModel.js'
 import { productCreate } from '../controllers/productController.js'
-import { authenticateToken, verifyRol } from '../middleware/auth.js'
 import { Category } from '../models/categoryModel.js'
+import { validateToken, requireAdmin } from '../services/auth.service.js'
 
 export const productRoutes = express.Router()
 
@@ -29,7 +29,7 @@ productRoutes.get("/", async(req,res)=>{
 
 productRoutes.get("/filtro", async(req,res)=>{
     try {
-        const { min, max, marca } = req.params
+        const { min, max, marca } = req.query
         const filtro ={}
         if(marca){
             filtro.marca = {}
@@ -41,7 +41,7 @@ productRoutes.get("/filtro", async(req,res)=>{
             if(max) filtro.precio.$lte = Number(max)
         }
         const products = await Product.find(filtro)
-        if(prosucts.length === 0){
+        if(products.length === 0){
             res.status(204).json([])
         }
         res.status(200).json(products)
@@ -86,26 +86,27 @@ productRoutes.get("/top", async(req,res)=>{
     }
 })
 
-productRoutes.post("/",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.post("/",validateToken,requireAdmin, async(req,res)=>{
     try {
         const {nombre,marca,descripcion,precio,categoria_id,stock} = req.body
         if(!nombre || !marca || !descripcion || !precio || !categoria_id || !stock){
-            res.status(400).json({mesagge: `Falta alguno de los datos`})
+            return res.status(400).json({mesagge: `Falta alguno de los datos`})
         }
-        const productExist = await Product.find({nombre})
+        const productExist = await Product.findOne({nombre})
         if(productExist){
-            res.status(400).json({mesagge: `El producto ya esta registrado`})
+            return res.status(400).json({mesagge: `El producto ya esta registrado`})
         }
         const newProduct = await productCreate(nombre,marca,descripcion,precio,categoria_id,stock)
-        const categoria = Category.findById({categoria_id})
+        const categoria = await Category.findById(categoria_id)
         categoria.productos.push(newProduct._id)
+        await categoria.save()
         res.status(201).json(newProduct)
     } catch (error) {
         res.status(500).json({mesagge: `Error en el post: ${error}`})
     }
 })
 
-productRoutes.put("/:id",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.put("/:id",validateToken,requireAdmin, async(req,res)=>{
     try {
         const { id } = req.params
         const datos = req.body
@@ -122,7 +123,7 @@ productRoutes.put("/:id",authenticateToken,verifyRol, async(req,res)=>{
     }
 })
 
-productRoutes.patch("/:id/stock",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.patch("/:id/stock",validateToken,requireAdmin, async(req,res)=>{
     try {
         const { id } = req.params
         const { stock } = req.body
@@ -143,7 +144,7 @@ productRoutes.patch("/:id/stock",authenticateToken,verifyRol, async(req,res)=>{
     }
 })
 
-productRoutes.delete("/:id",authenticateToken,verifyRol, async(req,res)=>{
+productRoutes.delete("/:id",validateToken,requireAdmin, async(req,res)=>{
     try {
         const {id} = req.params
         const productDelete = await Product.findByIdAndDelete(id)

@@ -1,11 +1,11 @@
 import express from "express"
 import { User}  from "../models/userModel.js"
 import { userCreate, login } from "../controllers/userController.js"
-import { authenticateToken, verifyRol } from "../middleware/auth.js"
+import { validateToken, requireAdmin } from "../services/auth.service.js"
 
 export const userRoutes = express.Router()
 
-userRoutes.get("/",authenticateToken,verifyRol,async(req,res)=>{
+userRoutes.get("/",validateToken,requireAdmin,async(req,res)=>{
     try {
         const users = await User.find()
         if(users.length === 0){
@@ -19,7 +19,7 @@ userRoutes.get("/",authenticateToken,verifyRol,async(req,res)=>{
 
 userRoutes.get("/:id", async(req,res)=>{
     try {
-        const id = req.params
+        const { id } = req.params
         const user = await User.findById(id)
         if(!user){
             res.status(400).json({mesagge: `El usuario no fue encontrado`})
@@ -62,7 +62,7 @@ userRoutes.post("/login", async(req,res)=>{
 
 userRoutes.delete("/:id", async(req,res)=>{
     try {
-        const id = req.params
+        const { id } = req.params
         const userDelete = await User.findByIdAndDelete(id)
         if(!userDelete){
             res.status(400).json({mesagge: `No se encontro el usuario`})

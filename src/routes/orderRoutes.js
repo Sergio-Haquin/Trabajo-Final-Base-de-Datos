@@ -1,9 +1,9 @@
 import express from 'express'
 import { Order } from '../models/orderModel.js'
 import { orderCreate } from '../controllers/orderController.js'
-import { authenticateToken, verifyRol } from '../middleware/auth.js'
 import { Estado } from '../enums/estado.js'
 import { Product } from '../models/productModel.js'
+import { validateToken, requireAdmin } from '../services/auth.service.js'
 
 export const orderRoutes = express.Router()
 
@@ -21,7 +21,7 @@ orderRoutes.get("/", async(req,res)=>{
     }
 })
 
-orderRoutes.get("/stats",authenticateToken,verifyRol, async(req,res)=>{
+orderRoutes.get("/stats",validateToken,requireAdmin, async(req,res)=>{
     try {
         const stats = await Order.aggregate([
             {
@@ -34,7 +34,7 @@ orderRoutes.get("/stats",authenticateToken,verifyRol, async(req,res)=>{
                 $sort: { totalPedidos: -1 }
             },
             {
-                $proyect: {
+                $project: {
                     estado: '$_id',
                     _id: 0,
                     totalPedidos: 1
@@ -43,11 +43,11 @@ orderRoutes.get("/stats",authenticateToken,verifyRol, async(req,res)=>{
         ])
         res.status(200).json(stats)
     } catch (error) {
-        req.status(500).json({mesagge: `Error en el get: ${error}`})
+        res.status(500).json({mesagge: `Error en el get: ${error}`})
     }
 })
 
-orderRoutes.get("/user/:userId",authenticateToken, async(req,res)=>{
+orderRoutes.get("/user/:userId",validateToken, async(req,res)=>{
     try {
         const {userId} = req.params
         const ordersUser = await Order.find({user_id: userId})
@@ -63,29 +63,37 @@ orderRoutes.get("/user/:userId",authenticateToken, async(req,res)=>{
     }
 })
 
-orderRoutes.post("/",authenticateToken, async(req,res)=>{
+orderRoutes.post("/",validateToken, async(req,res)=>{
     try {
-        const {user_id,estado,productos,metodoDePago} = req.body
-        if(!user_id || !estado || !productos?.length || !metodoDePago){
-            res.status(400).json({error: `Faltan datos del pedido`})
+        const { user_id, productos, metodoDePago } = req.body
+        if (!user_id || !productos?.length || !metodoDePago) {
+            return res.status(400).json({ error: "Faltan datos del pedido" })
         }
+        const fecha = Date.now()
+        const estado = 'pendiente'
         let total = 0
-        for (let p of productos){
-            const product = await Product.findById(p.producto_id)
-            if(!product){
-                res.status(400).json({error: `Producto no encontrado`})
+        const itemsConSubtotal = []
+        for (const producto of productos) {
+            const product = await Product.findById(producto.producto_id)
+            if (!product) {
+                return res.status(404).json({ error: `Producto no encontrado` })
             }
-            const subtotal = product.precio * p.cantidad
+            const subtotal = product.precio * producto.cantidad
             total += subtotal
+            itemsConSubtotal.push({
+            producto_id: product._id,
+            cantidad: producto.cantidad,
+            subtotal,
+            })
         }
-        const newOrder = await orderCreate(user_id,estado,productos,metodoDePago,total)
-        res.status(201).json(newOrder)
-    } catch (erro) {
+        const newOrder = await orderCreate(user_id,fecha,estado,itemsConSubtotal,metodoDePago,total)
+        return res.status(201).json(newOrder)
+    } catch (error) {
         res.status(500).json({mesagge: `Error en el post: ${error}`})
     }
 })
 
-orderRoutes.put("/:id",authenticateToken, async(req,res)=>{
+orderRoutes.put("/:id",validateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const {estado,productos,metodoDePago} = req.body
@@ -107,14 +115,14 @@ orderRoutes.put("/:id",authenticateToken, async(req,res)=>{
                 total += subtotal
                 productosActualizados.push({
                     producto_id: producto._id,
-                    cantidad: item.cantidad,
+                    cantidad: p.cantidad,
                     subtotal,
                 })
             }
         }
         orderExist.productos = productosActualizados
         orderExist.total = total
-        if (metodoPago) orederExist.metodoDePago = metodoDePago
+        if (metodoDePago) orderExist.metodoDePago = metodoDePago
         if (estado) orderExist.estado = estado
         const orderUpdate = await orderExist.save()
         const orderFinal = await Order.findById(orderUpdate._id)
@@ -126,7 +134,7 @@ orderRoutes.put("/:id",authenticateToken, async(req,res)=>{
     }
 })
 
-orderRoutes.patch("/:id/status",authenticateToken,verifyRol, async(req,res)=>{
+orderRoutes.patch("/:id/status",validateToken,requireAdmin, async(req,res)=>{
     try {
         const {id} = req.params
         const {nuevoestado} = req.body
@@ -134,7 +142,7 @@ orderRoutes.patch("/:id/status",authenticateToken,verifyRol, async(req,res)=>{
             res.status(400).json({mesagge: `Debe ingreasar el nuevo estado`})
         }
         const estadosValidos = Object.values(Estado);
-        if (!estadosValidos.includes(nuevoEstado)) {
+        if (!estadosValidos.includes(nuevoestado)) {
             return res.status(400).json({message: `Estado inválido. Los estados permitidos son ${estadosValidos.join(', ')}` })
         }
         const orderUpdate = await Order.findByIdAndUpdate(
@@ -143,15 +151,15 @@ orderRoutes.patch("/:id/status",authenticateToken,verifyRol, async(req,res)=>{
             {new: true, runValidators: true}
         )
         if(!orderUpdate){
-            req.status(400).json({mesagge: `Orden no encontrada`})
+            res.status(400).json({mesagge: `Orden no encontrada`})
         }
-        req.status(200).json(orderUpdate)
+        res.status(200).json(orderUpdate)
     } catch (error) {
-        req.status(500).json({mesagge: `Error en el patch: ${error}`})
+        res.status(500).json({mesagge: `Error en el patch: ${error}`})
     }
 })
 
-orderRoutes.delete("/:id",authenticateToken, async(req,res)=>{
+orderRoutes.delete("/:id",validateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const orderDelete = await Order.findByIdAndDelete(id)

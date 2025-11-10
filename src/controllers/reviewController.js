@@ -1,13 +1,12 @@
 import { Review } from '../models/reviewModel.js'
 
-export const reviewCreate = async(user_id,product_id,calificacion,comentario) => {
+export const reviewCreate = async(user_id,producto_id,calificacion,comentario) => {
     const review = new Review(
         {
             user_id,
-            product_id,
+            producto_id,
             calificacion,
-            comentario,
-            fecha
+            comentario
         }
     )
     const newReview = await review.save()

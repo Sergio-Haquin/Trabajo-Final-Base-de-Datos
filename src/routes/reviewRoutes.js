@@ -1,7 +1,9 @@
 import express from 'express'
 import { Review } from '../models/reviewModel.js'
+import { Order } from '../models/orderModel.js'
+import { Product } from '../models/productModel.js'
 import { reviewCreate } from '../controllers/reviewController.js'
-import { authenticateToken, verifyRol } from '../middleware/auth.js'
+import { validateToken } from '../services/auth.service.js'
 
 export const reviewRoutes = express.Router()
 
@@ -34,7 +36,7 @@ reviewRoutes.get("/product/:productId", async(req,res)=>{
 
 reviewRoutes.get("/top", async(req,res)=>{
     try {
-        const promCal = Review.aggregate([
+        const promCal = await Review.aggregate([
             {
                 $group: {
                     _id: "$producto_id",
@@ -44,9 +46,9 @@ reviewRoutes.get("/top", async(req,res)=>{
             },
             {
                 $lookup: {
-                    from: "Product",
+                    from: "products",
                     localField: "_id",
-                    foreignField: "producto_id",
+                    foreignField: "_id",
                     as: "producto"
                 }
             },
@@ -67,7 +69,7 @@ reviewRoutes.get("/top", async(req,res)=>{
     }
 })
 
-reviewRoutes.post("/",authenticateToken, async(req,res)=>{
+reviewRoutes.post("/",validateToken, async(req,res)=>{
     try {
         const {user_id,producto_id,calificacion,comentario} = req.body
         if(!user_id || !producto_id || !calificacion || !comentario){
@@ -89,7 +91,7 @@ reviewRoutes.post("/",authenticateToken, async(req,res)=>{
     }
 })
 
-reviewRoutes.put("/:id",authenticateToken, async(req,res)=>{
+reviewRoutes.put("/:id",validateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const datos = req.body
@@ -106,7 +108,7 @@ reviewRoutes.put("/:id",authenticateToken, async(req,res)=>{
     }
 })
 
-reviewRoutes.delete("/:id",authenticateToken, async(req,res)=>{
+reviewRoutes.delete("/:id",validateToken, async(req,res)=>{
     try {
         const {id} = req.params
         const reviewDelete = await Review.findByIdAndDelete(id)

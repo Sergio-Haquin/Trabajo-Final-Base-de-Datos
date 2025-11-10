@@ -1,11 +1,10 @@
 import {Category} from '../models/categoryModel.js'
 
-export const categoryCreate = async(nombre,descripcion,productos) => {
+export const categoryCreate = async(nombre,descripcion) => {
     const category = new Category(
         {
             nombre,
-            descripcion,
-            productos
+            descripcion
         }
     )
     const newCategory = await category.save()

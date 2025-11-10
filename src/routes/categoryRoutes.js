@@ -1,7 +1,8 @@
 import express from 'express'
 import { Category } from '../models/categoryModel.js'
+import { Product } from '../models/productModel.js'
 import { categoryCreate } from '../controllers/categoryController.js'
-import { verifyRol, authenticateToken } from '../middleware/auth.js'
+import { validateToken, requireAdmin } from '../services/auth.service.js'
 
 export const categoryRoutes = express.Router()
 
@@ -23,7 +24,7 @@ categoryRoutes.get("/stats", async(req,res)=>{
     }
 })
 
-categoryRoutes.post("/",authenticateToken,verifyRol, async(req,res)=>{
+categoryRoutes.post("/",validateToken,requireAdmin, async(req,res)=>{
     try {
         const {nombre,descripcion} = req.body
         if(!nombre || !descripcion){
@@ -33,14 +34,14 @@ categoryRoutes.post("/",authenticateToken,verifyRol, async(req,res)=>{
         if(categoryExist){
             res.status(400).json({mesagge: `La categoria ingresada ya existe`})
         }
-        const newCategory = categoryCreate(nombre,descripcion)
+        const newCategory = await categoryCreate(nombre,descripcion)
         res.status(201).json(newCategory)
     } catch (error) {
         res.status(500).json({mesagge: `Error en el post: ${error}`})
     }
 })
 
-categoryRoutes.put("/:id",authenticateToken,verifyRol, async(req,res)=>{
+categoryRoutes.put("/:id",validateToken,requireAdmin, async(req,res)=>{
     try {
         const { id } = req.params;
         const { nombre, descripcion } = req.body;
@@ -50,20 +51,20 @@ categoryRoutes.put("/:id",authenticateToken,verifyRol, async(req,res)=>{
             { new: true }
         )
         if (!categoryUpdate)
-            return res.status(404).json({ message: "Categoría no encontrada" })
+            res.status(404).json({ message: "Categoría no encontrada" })
         res.status(200).json(categoryUpdate)
     } catch (error) {
         res.status(500).json({mesagge: `Error en el put: ${error.mesagge}`})
     }
 })
 
-categoryRoutes.delete("/:id",authenticateToken,verifyRol, async(req,res)=>{
+categoryRoutes.delete("/:id",validateToken,requireAdmin, async(req,res)=>{
     try {
         const { id } = req.params;
         const categoryDelete = await Category.findByIdAndDelete(id);
         if (!categoryDelete)
-            return res.status(404).json({ message: "Categoría no encontrada" })
-        await Producto.deleteMany({ categoria_id: id })
+            res.status(404).json({ message: "Categoría no encontrada" })
+        await Product.updateMany({ categoria_id: id },{$unset: {categoria_id: ""}})
         res.status(200).json({ message: `Categoria eliminada correctament` });
     } catch (error) {
         res.status(500).json({mesagge: `Error en el delete: ${error.mesagge}`})
